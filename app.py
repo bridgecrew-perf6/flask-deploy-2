@@ -1,8 +1,7 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS
+import sys
 
 app = Flask(__name__)
-CORS(app)
 
 tweets = [
     "Sick of having to go to 2 different huts to buy pizza & sunglasses.", 
@@ -28,3 +27,21 @@ def tweets_get():
     else:
         return jsonify(tweets[tweet_id]), 200
     
+
+if len(sys.argv) > 1:
+    mode = sys.argv[1]
+else:
+    print("Missing required argument: testing|production")
+    exit()
+
+if mode == "testing":
+    from flask_cors import CORS
+    CORS(app)
+    app.run(debug=True)
+elif mode == "production":
+    import bjoern
+    print("Running in production mode!")
+    bjoern.run(app, "0.0.0.0", 5000)
+else:
+    print("Invalid mode, must be one of: testing|production")
+    exit()
